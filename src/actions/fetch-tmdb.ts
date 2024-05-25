@@ -2,12 +2,18 @@
 
 import { redirect } from 'next/navigation';
 import { ErrorPage } from '@/routes';
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import fetch from 'node-fetch';
 import { Schema } from 'zod';
 
 import { FetchTMDBParams } from '@/types/global-types';
 import { env } from '@/lib/env';
 
 const { TMDB_READ_ACCESS_TOKEN } = env;
+
+const proxy = 'http://127.0.0.1:10809';
+
+const agent = new HttpsProxyAgent(proxy);
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 
@@ -134,7 +140,7 @@ export const fetchTMDB = async <T>(
       },
     };
 
-    const response = await fetch(url, options);
+    const response = await fetch(url, { agent, ...options });
     if (!response.ok) {
       throw new Error(`HTTP error ${response.status} ${response}`);
     }
